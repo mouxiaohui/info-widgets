@@ -4,14 +4,14 @@ import { onMounted, ref } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
 
 interface Memory {
-  percentage: Number;
+  percentage: number;
   total: string;
   used: string;
 }
 
 interface SystemInfo {
-  battery_remaining_capacity: Number | null;
-  cpu_load: Number | null;
+  battery_remaining_capacity: number | null;
+  cpu_load: number | null;
   memory: Memory | null;
 }
 
@@ -47,6 +47,8 @@ function start() {
       memory: data.memory,
     };
 
+    console.log(refSystemInfo.value.cpu_load);
+
     updateIcon();
   }, 2000);
 }
@@ -65,9 +67,24 @@ onMounted(() => {
   <div id="widgets">
     <div class="info">
       <div class="battery">
-        <img :src="'src/assets/img/battery/' + refBatteryIcon + '.svg'" />
+        <img
+          style="width: 30px; height: 30px"
+          :src="'src/assets/img/battery/' + refBatteryIcon + '.svg'"
+        />
         <span>
           <p>{{ refSystemInfo.battery_remaining_capacity }}%</p>
+        </span>
+      </div>
+      <div class="cpu">
+        <img style="width: 30px; height: 30px" src="./assets/img/cpu.svg" />
+        <span>
+          <p>
+            {{
+              refSystemInfo.cpu_load
+                ? (refSystemInfo.cpu_load * 100).toFixed(0)
+                : ""
+            }}%
+          </p>
         </span>
       </div>
     </div>
@@ -80,7 +97,7 @@ onMounted(() => {
   height: 100%;
   color: white;
   cursor: pointer;
-  background-color: black;
+  /* background-color: black; */
   user-select: none;
 }
 
@@ -94,15 +111,25 @@ onMounted(() => {
   height: 30px;
   display: flex;
 }
-.battery img {
-  width: 30px;
-  height: 30px;
-}
 .battery span {
   width: 40px;
   height: 30px;
 }
 .battery span p {
-  margin-top: 8px;
+  margin-top: 6px;
+}
+
+/* ====== battery ====== */
+.cpu {
+  height: 30px;
+  display: flex;
+}
+.cpu span {
+  width: 40px;
+  height: 30px;
+  padding-left: 3px;
+}
+.cpu span p {
+  margin-top: 6px;
 }
 </style>

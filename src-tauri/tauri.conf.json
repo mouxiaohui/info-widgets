@@ -58,7 +58,7 @@
       {
         "title": "",
         "width": 200,
-        "height": 50,
+        "height": 1,
         "alwaysOnTop": true,
         "decorations": false,
         "resizable": false,
