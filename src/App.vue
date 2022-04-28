@@ -80,8 +80,20 @@ onMounted(() => {
         <span>
           <p>
             {{
-              refSystemInfo.cpu_load
+              refSystemInfo.cpu_load >= 0
                 ? (refSystemInfo.cpu_load * 100).toFixed(0)
+                : ""
+            }}%
+          </p>
+        </span>
+      </div>
+      <div class="memory">
+        <img style="width: 30px; height: 30px" src="./assets/img/memory.svg" />
+        <span>
+          <p>
+            {{
+              refSystemInfo.memory?.percentage >= 0
+                ? (refSystemInfo.memory?.percentage * 100).toFixed(0)
                 : ""
             }}%
           </p>
@@ -130,6 +142,19 @@ onMounted(() => {
   padding-left: 3px;
 }
 .cpu span p {
+  margin-top: 6px;
+}
+
+/* ====== memory ====== */
+.memory {
+  height: 30px;
+  display: flex;
+}
+.memory span {
+  height: 30px;
+  padding-left: 3px;
+}
+.memory span p {
   margin-top: 6px;
 }
 </style>

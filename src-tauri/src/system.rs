@@ -4,7 +4,7 @@ use tokio::time::sleep;
 
 #[derive(Serialize)]
 struct Memory {
-    percentage: u64,
+    percentage: f64,
     total: String,
     used: String,
 }
@@ -46,7 +46,7 @@ impl SystemInfo {
             Ok(mem) => {
                 let total = mem.total;
                 let used = saturating_sub_bytes(total, mem.free);
-                let per = used.as_u64() / total.as_u64();
+                let per = used.as_u64() as f64 / total.as_u64() as f64;
                 Some(Memory {
                     percentage: per,
                     total: total.to_string(),
