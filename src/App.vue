@@ -20,6 +20,22 @@ const refSystemInfo = ref<SystemInfo>({
   cpu_load: null,
   memory: null,
 });
+const refBatteryIcon = ref("battery_4");
+
+function updateIcon() {
+  const battery_cap = refSystemInfo.value.battery_remaining_capacity;
+  if (battery_cap) {
+    if (battery_cap >= 85) {
+      refBatteryIcon.value = "battery_4";
+    } else if (battery_cap >= 55) {
+      refBatteryIcon.value = "battery_3";
+    } else if (battery_cap >= 35) {
+      refBatteryIcon.value = "battery_2";
+    } else {
+      refBatteryIcon.value = "battery_1";
+    }
+  }
+}
 
 function start() {
   setInterval(async () => {
@@ -30,6 +46,8 @@ function start() {
       cpu_load: data.cpu_load,
       memory: data.memory,
     };
+
+    updateIcon();
   }, 2000);
 }
 
@@ -44,39 +62,47 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="widgets" class="no-select">
-    <div>电池:{{ refSystemInfo.battery_remaining_capacity }}</div>
-    <div>cpu_load:{{ refSystemInfo.cpu_load }}</div>
-    <div>
-      ram
-      <span>{{ refSystemInfo.memory?.percentage }} | </span>
-      <span>{{ refSystemInfo.memory?.used }} | </span>
-      <span>{{ refSystemInfo.memory?.total }}</span>
+  <div id="widgets">
+    <div class="info">
+      <div class="battery">
+        <img :src="'src/assets/img/battery/' + refBatteryIcon + '.svg'" />
+        <span>
+          <p>{{ refSystemInfo.battery_remaining_capacity }}%</p>
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <style>
-html,
-body,
-#app {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.no-select {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
 #widgets {
   width: 100%;
   height: 100%;
   color: white;
   cursor: pointer;
   background-color: black;
+  user-select: none;
+}
+
+.info {
+  height: 30px;
+  display: flex;
+}
+
+/* ====== battery ====== */
+.battery {
+  height: 30px;
+  display: flex;
+}
+.battery img {
+  width: 30px;
+  height: 30px;
+}
+.battery span {
+  width: 40px;
+  height: 30px;
+}
+.battery span p {
+  margin-top: 8px;
 }
 </style>
