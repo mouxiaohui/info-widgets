@@ -64,8 +64,6 @@ impl SystemInfo {
             Err(_) => None,
         };
 
-        // println!("{}", cpu_load.unwrap());
-
         Self {
             cpu_load,
             memory,

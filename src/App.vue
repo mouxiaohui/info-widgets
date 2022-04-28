@@ -1,21 +1,60 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
+import { ref, onMounted } from "vue";
 
-async function get_system_info(i: Number) {
-  const res = await invoke("get_system_info");
-  console.log(i, res);
-  return res
+interface Memory {
+  percentage: Number;
+  total: string;
+  used: string;
 }
 
-let i = 0;
-setInterval(() => {
-  get_system_info(i);
-  i++;
-}, 2000);
+interface SystemInfo {
+  battery_remaining_capacity: Number | null;
+  cpu_load: Number | null;
+  memory: Memory | null;
+}
+
+const refSystemInfo = ref<SystemInfo>({
+  battery_remaining_capacity: null,
+  cpu_load: null,
+  memory: null,
+});
+
+function start() {
+  setInterval(async () => {
+    let data = (await invoke("get_system_info")) as SystemInfo;
+
+    refSystemInfo.value = {
+      battery_remaining_capacity: data.battery_remaining_capacity,
+      cpu_load: data.cpu_load,
+      memory: data.memory,
+    };
+  }, 2000);
+}
+
+start();
+
+onMounted(() => {
+  let w = document.getElementById("widgets");
+  if (w) {
+    w.children[0].setAttribute("data-tauri-drag-region", "");
+  }
+});
 </script>
 
 <template>
-  <div class="app" data-tauri-drag-region>Hello World</div>
+  <div id="widgets" class="no-select" data-tauri-drag-region>
+    <div>
+      <div>电池:{{ refSystemInfo.battery_remaining_capacity }}</div>
+      <div>cpu_load:{{ refSystemInfo.cpu_load }}</div>
+      <div>
+        ram
+        <span>{{ refSystemInfo.memory?.percentage }} | </span>
+        <span>{{ refSystemInfo.memory?.used }} | </span>
+        <span>{{ refSystemInfo.memory?.total }}</span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style>
@@ -26,11 +65,21 @@ body,
   margin: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-.app {
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#widgets {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  color: white;
+  cursor: pointer;
+  background-color: black;
 }
 </style>
