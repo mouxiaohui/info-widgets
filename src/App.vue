@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import { appWindow } from "@tauri-apps/api/window";
 
 interface Memory {
   percentage: Number;
@@ -37,22 +38,20 @@ start();
 onMounted(() => {
   let w = document.getElementById("widgets");
   if (w) {
-    w.children[0].setAttribute("data-tauri-drag-region", "");
+    addEventListener("mousedown", () => appWindow.startDragging());
   }
 });
 </script>
 
 <template>
-  <div id="widgets" class="no-select" data-tauri-drag-region>
+  <div id="widgets" class="no-select">
+    <div>电池:{{ refSystemInfo.battery_remaining_capacity }}</div>
+    <div>cpu_load:{{ refSystemInfo.cpu_load }}</div>
     <div>
-      <div>电池:{{ refSystemInfo.battery_remaining_capacity }}</div>
-      <div>cpu_load:{{ refSystemInfo.cpu_load }}</div>
-      <div>
-        ram
-        <span>{{ refSystemInfo.memory?.percentage }} | </span>
-        <span>{{ refSystemInfo.memory?.used }} | </span>
-        <span>{{ refSystemInfo.memory?.total }}</span>
-      </div>
+      ram
+      <span>{{ refSystemInfo.memory?.percentage }} | </span>
+      <span>{{ refSystemInfo.memory?.used }} | </span>
+      <span>{{ refSystemInfo.memory?.total }}</span>
     </div>
   </div>
 </template>
@@ -61,8 +60,6 @@ onMounted(() => {
 html,
 body,
 #app {
-  padding: 0;
-  margin: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
