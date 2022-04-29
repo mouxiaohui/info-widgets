@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
 
 interface Memory {
@@ -41,17 +41,22 @@ function updateIcon() {
   }
 }
 
+async function getInfo() {
+  let data = (await invoke("get_system_info")) as SystemInfo;
+  refSystemInfo.value = {
+    battery_remaining_capacity: data.battery_remaining_capacity,
+    cpu_load: data.cpu_load,
+    memory: data.memory,
+  };
+
+  updateIcon();
+}
+
 function start() {
-  setInterval(async () => {
-    let data = (await invoke("get_system_info")) as SystemInfo;
+  getInfo();
 
-    refSystemInfo.value = {
-      battery_remaining_capacity: data.battery_remaining_capacity,
-      cpu_load: data.cpu_load,
-      memory: data.memory,
-    };
-
-    updateIcon();
+  setInterval(() => {
+    getInfo();
   }, 2000);
 }
 
