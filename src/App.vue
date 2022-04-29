@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { invoke } from "@tauri-apps/api/tauri";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { appWindow } from "@tauri-apps/api/window";
 
 interface Memory {
@@ -21,6 +21,10 @@ const refSystemInfo = ref<SystemInfo>({
   memory: null,
 });
 const refBatteryIcon = ref("battery_4");
+
+function getImageUrl(name: String) {
+  return new URL(`./assets/img/battery/${name}.svg`, import.meta.url).href;
+}
 
 function updateIcon() {
   const battery_cap = refSystemInfo.value.battery_remaining_capacity;
@@ -47,8 +51,6 @@ function start() {
       memory: data.memory,
     };
 
-    console.log(refSystemInfo.value.cpu_load);
-
     updateIcon();
   }, 2000);
 }
@@ -68,8 +70,9 @@ onMounted(() => {
     <div class="info">
       <div class="battery">
         <img
+          id="battery-icon"
           style="width: 30px; height: 30px"
-          :src="'src/assets/img/battery/' + refBatteryIcon + '.svg'"
+          :src="getImageUrl(refBatteryIcon)"
         />
         <span>
           <p>{{ refSystemInfo.battery_remaining_capacity }}%</p>
@@ -131,13 +134,13 @@ onMounted(() => {
   margin-top: 6px;
 }
 
-/* ====== battery ====== */
+/* ====== apu ====== */
 .cpu {
   height: 30px;
   display: flex;
 }
 .cpu span {
-  width: 40px;
+  width: 35px;
   height: 30px;
   padding-left: 3px;
 }
