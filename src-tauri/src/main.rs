@@ -5,23 +5,38 @@
 
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+    SystemTraySubmenu,
 };
 
 use system::SystemInfo;
 
 mod system;
 
-fn main() {
+fn generate_tray() -> SystemTray {
     let quit = CustomMenuItem::new("quit".to_string(), "退出");
     let hide = CustomMenuItem::new("hide".to_string(), "隐藏");
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(quit)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(hide);
 
-    let tray = SystemTray::new().with_menu(tray_menu);
+    let white_font = CustomMenuItem::new("white-font".to_string(), "白色");
+    let black_font = CustomMenuItem::new("black-font".to_string(), "黑色");
+    let font_color_submenu = SystemTraySubmenu::new(
+        "字体颜色",
+        SystemTrayMenu::new()
+            .add_item(white_font)
+            .add_item(black_font),
+    );
+
+    let tray_menu = SystemTrayMenu::new()
+        .add_submenu(font_color_submenu)
+        .add_item(hide)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(quit);
+
+    SystemTray::new().with_menu(tray_menu)
+}
+
+fn main() {
     tauri::Builder::default()
-        .system_tray(tray)
+        .system_tray(generate_tray())
         .invoke_handler(tauri::generate_handler![get_system_info])
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::LeftClick {
@@ -39,6 +54,14 @@ fn main() {
                 "hide" => {
                     let window = app.get_window("main").unwrap();
                     window.hide().unwrap();
+                }
+                "white-font" => {
+                    let window = app.get_window("main").unwrap();
+                    window.eval("window['setFontColor']('white')").unwrap();
+                }
+                "black-font" => {
+                    let window = app.get_window("main").unwrap();
+                    window.eval("window['setFontColor']('black')").unwrap();
                 }
                 _ => {}
             },

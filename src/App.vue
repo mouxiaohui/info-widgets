@@ -15,6 +15,7 @@ interface SystemInfo {
   memory: Memory | null;
 }
 
+const refFontColor = ref("white");
 const refSystemInfo = ref<SystemInfo>({
   battery_remaining_capacity: null,
   cpu_load: null,
@@ -44,7 +45,9 @@ function updateIcon() {
 async function getInfo() {
   let data = (await invoke("get_system_info")) as SystemInfo;
   refSystemInfo.value = {
-    battery_remaining_capacity: data.battery_remaining_capacity,
+    battery_remaining_capacity: data.battery_remaining_capacity
+      ? data.battery_remaining_capacity
+      : 100,
     cpu_load: data.cpu_load,
     memory: data.memory,
   };
@@ -68,6 +71,10 @@ onMounted(() => {
     addEventListener("mousedown", () => appWindow.startDragging());
   }
 });
+
+window.setFontColor = (color: string) => {
+  refFontColor.value = color;
+};
 </script>
 
 <template>
@@ -115,7 +122,7 @@ onMounted(() => {
 #widgets {
   width: 100%;
   height: 100%;
-  color: white;
+  color: v-bind(refFontColor);
   cursor: pointer;
   /* background-color: black; */
   user-select: none;
